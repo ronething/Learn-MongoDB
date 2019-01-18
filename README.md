@@ -486,6 +486,15 @@ db.collection.remove(
 -   query ：可选，使用查询操作符指定查询条件
 -   projection ：可选，使用投影操作符指定返回的键。查询时返回文档中所有键值， 只需省略该参数即可（默认省略）。
 
+⚠️ 第一个{} 放where条件 第二个{} 指定那些列显示和不显示 （0表示不显示 1表示显示)
+
+```sh
+> db.nihao.find({"title":{$type:"string"}},{"title":1,"_id":0})
+{ "title" : "MongoDB 教程" }
+> db.nihao.find({"title":{$type:"string"}},{"title":0,"_id":0})
+{ "description" : "MongoDB 是一个 Nosql 数据库", "by" : "菜鸟教程", "url" : "http://www.runoob.com", "tags" : [ "mongodb", "database", "NoSQL" ], "likes" : 100 }
+```
+
 ## MongoDB 与 RDBMS Where 语句比较
 
 <table class="reference"><thead><tr><th>操作</th><th>格式</th><th>范例</th><th>RDBMS中的类似语句</th></tr></thead><tbody><tr><td>等于</td><td><code>{&lt;key&gt;:&lt;value&gt;</code>}</td><td><code>db.col.find({"by":"菜鸟教程"}).pretty()</code></td><td><code>where by='菜鸟教程'</code></td></tr><tr><td>小于</td><td><code>{&lt;key&gt;:{$lt:&lt;value&gt}}</code></td><td><code>db.col.find({"likes":{$lt:50}}).pretty()</code></td><td><code>where likes&lt;50</code></td></tr><tr><td>小于或等于</td><td><code>{&lt;key&gt;:{$lte:&lt;value&gt}}</code></td><td><code>db.col.find({"likes":{$lte:50}}).pretty()</code></td><td><code>where likes&lt;=50</code></td></tr><tr><td>大于</td><td><code>{&lt;key&gt;:{$gt:&lt;value&gt}}</code></td><td><code>db.col.find({"likes":{$gt:50}}).pretty()</code></td><td><code>where likes&gt;50</code></td></tr><tr><td>大于或等于</td><td><code>{&lt;key&gt;:{$gte:&lt;value&gt}}</code></td><td><code>db.col.find({"likes":{$gte:50}}).pretty()</code></td><td><code>where likes&gt;=50</code></td></tr><tr><td>不等于</td><td><code>{&lt;key&gt;:{$ne:&lt;value&gt}}</code></td><td><code>db.col.find({"likes":{$ne:50}}).pretty()</code></td><td><code>where likes!=50</code></td></tr></tbody></table>
@@ -519,3 +528,274 @@ MongoDB 的 find() 方法可以传入多个键(key)，每个键(key)以逗号隔
 >db.col.find({"likes": {$gt:50}, $or: [{"by": "菜鸟教程"},{"title": "MongoDB 教程"}]}).pretty()
 ```
 
+## MongoDB 条件操作符
+
+-   (>) 大于 - $gt
+-   (<) 小于 - $lt
+-   (>=) 大于等于 - $gte
+-   (<= ) 小于等于 - $lte
+
+
+### MongoDB 使用 (<) 和 (>) 查询 - $lt 和 $gt
+
+`db.col.find({likes : {$lt :200, $gt : 100}})`
+
+### `$type`
+
+<table border="1"class="docutils"><colgroup><col width="25%"><col width="25%"><col width="25%"><col width="25%"></colgroup><thead valign="bottom"><tr class="row-odd"><th class="head">Type</th><th class="head">Number</th><th class="head">Alias</th><th class="head">Notes</th></tr></thead><tbody valign="top"><tr class="row-even"><td>Double</td><td>1</td><td>“double”</td><td>&nbsp;</td></tr><tr class="row-odd"><td>String</td><td>2</td><td>“string”</td><td>&nbsp;</td></tr><tr class="row-even"><td>Object</td><td>3</td><td>“object”</td><td>&nbsp;</td></tr><tr class="row-odd"><td>Array</td><td>4</td><td>“array”</td><td>&nbsp;</td></tr><tr class="row-even"><td>Binary data</td><td>5</td><td>“binData”</td><td>&nbsp;</td></tr><tr class="row-odd"><td>Undefined</td><td>6</td><td>“undefined”</td><td>Deprecated.</td></tr><tr class="row-even"><td>ObjectId</td><td>7</td><td>“objectId”</td><td>&nbsp;</td></tr><tr class="row-odd"><td>Boolean</td><td>8</td><td>“bool”</td><td>&nbsp;</td></tr><tr class="row-even"><td>Date</td><td>9</td><td>“date”</td><td>&nbsp;</td></tr><tr class="row-odd"><td>Null</td><td>10</td><td>“null”</td><td>&nbsp;</td></tr><tr class="row-even"><td>Regular Expression</td><td>11</td><td>“regex”</td><td>&nbsp;</td></tr><tr class="row-odd"><td>DBPointer</td><td>12</td><td>“dbPointer”</td><td>Deprecated.</td></tr><tr class="row-even"><td>JavaScript</td><td>13</td><td>“javascript”</td><td>&nbsp;</td></tr><tr class="row-odd"><td>Symbol</td><td>14</td><td>“symbol”</td><td>Deprecated.</td></tr><tr class="row-even"><td>JavaScript(with scope)</td><td>15</td><td>“javascriptWithScope”</td><td>&nbsp;</td></tr><tr class="row-odd"><td>32-bit integer</td><td>16</td><td>“int”</td><td>&nbsp;</td></tr><tr class="row-even"><td>Timestamp</td><td>17</td><td>“timestamp”</td><td>&nbsp;</td></tr><tr class="row-odd"><td>64-bit integer</td><td>18</td><td>“long”</td><td>&nbsp;</td></tr><tr class="row-even"><td>Decimal128</td><td>19</td><td>“decimal”</td><td>New in version 3.4.</td></tr><tr class="row-odd"><td>Min key</td><td>-1</td><td>“minKey”</td><td>&nbsp;</td></tr><tr class="row-even"><td>Max key</td><td>127</td><td>“maxKey”</td><td>&nbsp;</td></tr></tbody></table>
+
+
+⚠️ `db.nihao.insert({"title":123})` 插入的 title 的 123 是 Double 类型 不是 int 或者 long
+
+## MongoDB Limit与Skip方法
+
+## Limit()
+
+`>db.COLLECTION_NAME.find().limit(NUMBER)`
+
+## Skip()
+
+可以使用skip()方法来跳过指定数量的数据
+
+`>db.COLLECTION_NAME.find().skip(NUMBER)`
+
+or
+
+`>db.COLLECTION_NAME.find().limit(NUMBER).skip(NUMBER)`
+
+## MongoDB 排序
+
+### sort()
+
+-   sort() 方法可以通过参数指定排序的字段，并使用 1 和 -1 来指定排序的方式，其中 1 为升序排列，而 -1 是用于降序排列。
+
+`>db.COLLECTION_NAME.find().sort({KEY:1})`
+
+## MongoDB 索引
+
+### createIndex() 
+
+`>db.collection.createIndex(keys, options)`
+
+> 语法中 Key 值为你要创建的索引字段，1 为指定按升序创建索引，如果你想按降序来创建索引指定为 -1 即可。
+
+
+-   查看集合索引 `db.col.getIndexes()`
+-   查看集合索引大小 `db.col.totalIndexSize()`
+-   删除集合所有索引 `db.col.dropIndexes()`
+-   删除集合指定索引 `db.col.dropIndex("索引名称")`
+
+<table class="reference"><tbody><tr><th style="width:10%;">Parameter</th><th style="width:10%;">Type</th><th>Description</th></tr><tr style=""><td>background</td><td>Boolean</td><td>建索引过程会阻塞其它数据库操作，background可指定以后台方式创建索引，即增加"background"可选参数。"background"默认值为<b>false</b>。</td></tr><tr><td>unique</td><td>Boolean</td><td>建立的索引是否唯一。指定为true创建唯一索引。默认值为<b>false</b>.</td></tr><tr style=""><td>name</td><td>string</td><td>索引的名称。如果未指定，MongoDB的通过连接索引的字段名和排序顺序生成一个索引名称。</td></tr><tr><td>dropDups</td><td>Boolean</td><td><span class="important">3.0+版本已废弃。</span>在建立唯一索引时是否删除重复记录,指定true创建唯一索引。默认值为<b>false</b>.</td></tr><tr style=""><td>sparse</td><td>Boolean</td><td>对文档中不存在的字段数据不启用索引；这个参数需要特别注意，如果设置为true的话，在索引字段中不会查询出不包含对应字段的文档.。默认值为<b>false</b>.</td></tr><tr><td>expireAfterSeconds</td><td>integer</td><td>指定一个以秒为单位的数值，完成TTL设定，设定集合的生存时间。</td></tr><tr style=""><td>v</td><td>index version</td><td>索引的版本号。默认的索引版本取决于mongod创建索引时运行的版本。</td></tr><tr><td>weights</td><td>document</td><td>索引权重值，数值在1到99,999之间，表示该索引相对于其他索引字段的得分权重。</td></tr><tr style=""><td>default_language</td><td>string</td><td>对于文本索引，该参数决定了停用词及词干和词器的规则的列表。默认为英语</td></tr><tr><td>language_override</td><td>string</td><td>对于文本索引，该参数指定了包含在文档中的字段名，语言覆盖默认的language，默认值为language.</td></tr></tbody></table>
+
+## MongoDB 聚合
+
+### aggregate()
+
+`>db.COLLECTION_NAME.aggregate(AGGREGATE_OPERATION)`
+
+<table class="reference"><tbody><tr><th style="width:10%;">表达式</th><th style="width:50%">描述</th><th>实例</th></tr><tr><td>$sum</td><td>计算总和。</td><td>db.mycol.aggregate([{$group:{_id:"$by_user",num_tutorial:{$sum:"$likes"}}}])</td></tr><tr><td>$avg</td><td>计算平均值</td><td>db.mycol.aggregate([{$group:{_id:"$by_user",num_tutorial:{$avg:"$likes"}}}])</td></tr><tr><td>$min</td><td>获取集合中所有文档对应值得最小值。</td><td>db.mycol.aggregate([{$group:{_id:"$by_user",num_tutorial:{$min:"$likes"}}}])</td></tr><tr><td>$max</td><td>获取集合中所有文档对应值得最大值。</td><td>db.mycol.aggregate([{$group:{_id:"$by_user",num_tutorial:{$max:"$likes"}}}])</td></tr><tr><td>$push</td><td>在结果文档中插入值到一个数组中。</td><td>db.mycol.aggregate([{$group:{_id:"$by_user",url:{$push:"$url"}}}])</td></tr><tr><td>$addToSet</td><td>在结果文档中插入值到一个数组中，但不创建副本。</td><td>db.mycol.aggregate([{$group:{_id:"$by_user",url:{$addToSet:"$url"}}}])</td></tr><tr><td>$first</td><td>根据资源文档的排序获取第一个文档数据。</td><td>db.mycol.aggregate([{$group:{_id:"$by_user",first_url:{$first:"$url"}}}])</td></tr><tr><td>$last</td><td>根据资源文档的排序获取最后一个文档数据</td><td>db.mycol.aggregate([{$group:{_id:"$by_user",last_url:{$last:"$url"}}}])</td></tr></tbody></table>
+
+### 管道
+
+-   $project：修改输入文档的结构。可以用来重命名、增加或删除域，也可以用于创建计算结果以及嵌套文档。
+-   $match：用于过滤数据，只输出符合条件的文档。$match使用MongoDB的标准查询操作。
+-   $limit：用来限制MongoDB聚合管道返回的文档数。
+-   $skip：在聚合管道中跳过指定数量的文档，并返回余下的文档。
+-   $unwind：将文档中的某一个数组类型字段拆分成多条，每条包含数组中的一个值。
+-   $group：将集合中的文档分组，可用于统计结果。
+-   $sort：将输入文档排序后输出。
+-   $geoNear：输出接近某一地理位置的有序文档。
+
+```sh
+# $project
+
+db.article.aggregate(
+    { $project : {
+        title : 1 ,
+        author : 1 ,
+    }}
+ );
+
+ # $match
+
+ db.articles.aggregate( [
+                        { $match : { score : { $gt : 70, $lte : 90 } } },
+                        { $group: { _id: null, count: { $sum: 1 } } }
+                       ] );
+
+# ¥skip
+
+db.article.aggregate(
+    { $skip : 5 });
+```
+
+## MongoDB 复制（副本集）
+
+-   MongoDB复制是将数据同步在多个服务器的过程。
+
+-   复制提供了数据的冗余备份，并在多个服务器上存储数据副本，提高了数据的可用性， 并可以保证数据的安全性。
+
+-   复制还允许您从硬件故障和服务中断中恢复数据
+
+### 什么是复制
+
+-   保障数据的安全性
+-   数据高可用性 (24*7)
+-   灾难恢复
+-   无需停机维护（如备份，重建索引，压缩）
+-   分布式读取数据
+
+### 复制原理
+
+mongodb的复制至少需要两个节点。其中一个是主节点，负责处理客户端请求，其余的都是从节点，负责复制主节点上的数据。
+
+mongodb各个节点常见的搭配方式为：一主一从、一主多从。
+
+主节点记录在其上的所有操作oplog，从节点定期轮询主节点获取这些操作，然后对自己的数据副本执行这些操作，从而保证从节点的数据与主节点一致。
+
+![](https://raw.githubusercontent.com/ronething/Image-Hosting/master/img/20190118114747.png)
+
+### 副本集特征
+
+-   N 个节点的集群
+-   任何节点可作为主节点
+-   所有写入操作都在主节点上
+-   自动故障转移
+-   自动恢复
+
+**--replSet**
+
+rs.initiate()
+
+rs.conf()
+
+rs.status()
+
+`>rs.add(HOST_NAME:PORT)`
+
+⚠️ MongoDB的副本集与我们常见的主从有所不同，主从在主机宕机后所有服务将停止，而副本集在主机宕机后，副本会接管主节点成为主节点，不会出现宕机的情况。
+
+## MongoDB 分片
+
+-   复制所有的写入操作到主节点
+-   延迟的敏感数据会在主节点查询
+-   单个副本集限制在12个节点
+-   当请求量巨大时会出现内存不足。
+-   本地磁盘不足
+-   垂直扩展价格昂贵
+
+![](https://raw.githubusercontent.com/ronething/Image-Hosting/master/img/20190118140842.png)
+
+-   Shard:
+
+    用于存储实际的数据块，实际生产环境中一个shard server角色可由几台机器组成一个replica set承担，防止主机单点故障
+
+-   Config Server:
+
+    mongod实例，存储了整个 ClusterMetadata，其中包括 chunk信息。
+
+-   Query Routers:
+    
+    前端路由，客户端由此接入，且让整个集群看上去像单一数据库，前端应用可以透明使用。
+
+### [分片实例](http://www.runoob.com/mongodb/mongodb-sharding.html)
+
+```sh
+Shard Server 1：27020
+Shard Server 2：27021
+Shard Server 3：27022
+Shard Server 4：27023
+Config Server ：27100
+Route Process：40000
+```
+
+启动 `Shard Serer`
+
+```
+[root@100 /]# mkdir -p /www/mongoDB/shard/s0
+[root@100 /]# mkdir -p /www/mongoDB/shard/s1
+[root@100 /]# mkdir -p /www/mongoDB/shard/s2
+[root@100 /]# mkdir -p /www/mongoDB/shard/s3
+[root@100 /]# mkdir -p /www/mongoDB/shard/log
+[root@100 /]# /usr/local/mongoDB/bin/mongod --port 27020 --dbpath=/www/mongoDB/shard/s0 --logpath=/www/mongoDB/shard/log/s0.log --logappend --fork
+....
+[root@100 /]# /usr/local/mongoDB/bin/mongod --port 27023 --dbpath=/www/mongoDB/shard/s3 --logpath=/www/mongoDB/shard/log/s3.log --logappend --fork
+```
+
+启动 `Config Server`
+
+```
+[root@100 /]# mkdir -p /www/mongoDB/shard/config
+[root@100 /]# /usr/local/mongoDB/bin/mongod --port 27100 --dbpath=/www/mongoDB/shard/config --logpath=/www/mongoDB/shard/log/config.log --logappend --fork
+```
+
+启动 `Route Process`
+
+```
+/usr/local/mongoDB/bin/mongos --port 40000 --configdb localhost:27100 --fork --logpath=/www/mongoDB/shard/log/route.log --chunkSize 500
+```
+
+配置 Sharing
+
+```
+[root@100 shard]# /usr/local/mongoDB/bin/mongo admin --port 40000
+MongoDB shell version: 2.0.7
+connecting to: 127.0.0.1:40000/admin
+mongos> db.runCommand({ addshard:"localhost:27020" })
+{ "shardAdded" : "shard0000", "ok" : 1 }
+......
+mongos> db.runCommand({ addshard:"localhost:27029" })
+{ "shardAdded" : "shard0009", "ok" : 1 }
+mongos> db.runCommand({ enablesharding:"test" }) #设置分片存储的数据库
+{ "ok" : 1 }
+mongos> db.runCommand({ shardcollection: "test.log", key: { id:1,time:1}})
+{ "collectionsharded" : "test.log", "ok" : 1 }
+```
+
+最后，直接按照连接普通的mongo数据库那样，将数据库连接接入接口40000
+
+## 备份(mongodump)与恢复(mongorestore)
+
+### 备份
+
+`>mongodump -h dbhost -d dbname -o dbdirectory`
+
+-   -h：MongDB所在服务器地址，例如：127.0.0.1，当然也可以指定端口号：127.0.0.1:27017
+
+-   -d：需要备份的数据库实例，例如：test
+
+-   -o：备份的数据存放位置，该目录需要提前建立，在备份完成后，系统自动在目录下建立一个test目录，这个目录里面存放该数据库实例的备份数据。
+
+<table class="reference"><tbody><tr><th style="width:40%">语法</th><th style="width:30%">描述</th><th>实例</th></tr><tr><td>mongodump--host HOST_NAME--port PORT_NUMBER</td><td>该命令将备份所有MongoDB数据</td><td>mongodump--host runoob.com--port 27017</td></tr><tr><td>mongodump--dbpath DB_PATH--out BACKUP_DIRECTORY</td><td></td><td>mongodump--dbpath/data/db/--out/data/backup/</td></tr><tr><td>mongodump--collection COLLECTION--db DB_NAME</td><td>该命令将备份指定数据库的集合。</td><td>mongodump--collection mycol--db test</td></tr></tbody></table>
+
+### 恢复
+
+`>mongorestore -h <hostname><:port> -d dbname <path>`
+
+-   --host <:port>, -h <:port>：MongoDB所在服务器地址，默认为： localhost:27017
+
+-   --db , -d ：需要恢复的数据库实例，例如：test，当然这个名称也可以和备份时候的不一样，比如test2
+
+-   --drop：恢复的时候，先删除当前数据，然后恢复备份的数据。就是说，恢复后，备份后添加修改的数据都会被删除，慎用哦！
+
+-   <path>：mongorestore 最后的一个参数，设置备份数据所在位置，例如：/data/db/test。你不能同时指定 <path> 和 --dir 选项，--dir也可以设置备份目录。
+
+-   --dir：指定备份的目录 你不能同时指定 <path> 和 --dir 选项。
+
+## MongoDB 监控
+
+`mongostat`
+
+`mongotop`
+
+mongotop提供每个集合的水平的统计数据。
+
+-   ns：包含数据库命名空间，后者结合了数据库名称和集合。
+
+-   db：包含数据库的名称。名为 . 的数据库针对全局锁定，而非特定数据库。
+
+-   total：mongod花费的时间工作在这个命名空间提供总额。
+
+-   read：提供了大量的时间，这mongod花费在执行读操作，在此命名空间。
+
+-   write：提供这个命名空间进行写操作，这mongod花了大量的时间。
